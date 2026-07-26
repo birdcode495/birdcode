@@ -1,5 +1,5 @@
 import streamlit as st
-from cards import iniciar_sesion, cargar_archivo_link
+from cards import iniciar_sesion, cargar_archivo_link, lista_especies
 
 
 col_init1, col_init2 = st.columns([2,1])
@@ -26,11 +26,9 @@ with cols[1].container(height = 310):
 
 	cargar_archivo_link()
 
-	
+with cols[0].container(height = 310):
 
-# with cols[0].container(height = 310):
-
-# 	hashing()
+	lista_especies()
 
 # with cols[1].container(height = 310):
 
