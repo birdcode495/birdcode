@@ -21,5 +21,5 @@ def lista_especies():
 
 def especies_amenazadas():
 
-	st.page_link('lista_especies_amenazadas.py', label = 'Consulta las especies amenazadas en tu proyecto', icon = ':material/star:')
+	st.page_link('lista_especies_amenazadas.py', label = 'Especies amenazadas en tu proyecto', icon = ':material/star:')
 	st.image('Images/Endangered_species.png', width = 240)
