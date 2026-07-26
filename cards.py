@@ -16,4 +16,10 @@ def cargar_archivo_link():
 def lista_especies():
 
 	st.page_link('lista_especies.py', label = 'Consulta la lista de especies en tu proyecto', icon = ':material/local_florist:')
-	st.image('Images/Eagle3.png', width = 270)#, use_container_width = True)
+	st.image('Images/Eagle3.png', width = 270)
+
+
+def especies_amenazadas():
+
+	st.page_link('lista_especies_amenazadas.py', label = 'Consulta las especies amenazadas en tu proyecto', icon = ':material/star:')
+	st.image('Images/Endangered_species.png', width = 240)
