@@ -7,6 +7,11 @@ pages = [
 		icon = ':material/home:'
 		),
 	st.Page(
+		'login.py',
+		title = 'Login',
+		icon = ':material/login:'
+		),
+	st.Page(
 		'carga_archivo.py',
 		title = 'Carga tu archivo',
 		icon = ':material/upload_file:'
@@ -45,6 +50,10 @@ with st.sidebar.container(height=310):
     if page.title == 'Home':
 
         st.page_link("home.py", label = 'Home')
+
+    elif page.title == 'Login':
+
+    	st.page_link('login.py', label = 'Login')
 
     elif page.title == 'Carga tu archivo':
 
