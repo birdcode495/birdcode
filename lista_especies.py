@@ -26,7 +26,7 @@ else:
 		st.write('A continuación se presentan los campos taxonómicos principales extraidos para la linea base: ')
 
 		# 3. Select standard Darwin Core columns dynamically safely
-		columnas_interes = ['scientificName', 'family', 'kingdom', 'basisOfRecord', 'year', 'coordinateUncertaintyInMeters']
+		columnas_interes = ['scientificName', 'kingdom', 'class', 'family', 'basisOfRecord', 'year', 'coordinateUncertaintyInMeters']
 
 		# Ensure columns exists in the database to prevent crashes
 		columnas_existentes = [col for col in columnas_interes if col in df.columns]
@@ -36,8 +36,9 @@ else:
 		# Renaming columns for localized corporate presentation
 		nombres_columnas = {
 			'scientificName': 'Nombre cientifico',
-			'family': 'Familia',
 			'kingdom': 'Reino',
+			'class': 'Clase',
+			'family': 'Familia',
 			'basisOfRecord': 'Naturaleza del registro',
 			'year': 'Año',
 			'coordinateUncertaintyInMeters': 'Incertidumbre (m)'
