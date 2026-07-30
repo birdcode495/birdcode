@@ -21,19 +21,49 @@ uploaded_files = st.file_uploader("Suba el archivo .zip de su shapefile o archiv
 
 if uploaded_files is not None:
 
-    # 1. Read input in the UI layer
-    bytes_data = io.BytesIO(uploaded_files.read())
-    gdf_cliente = gpd.read_file(bytes_data)
+    try:
 
-    # 2. Call the backend processing module safely
-    with st.spinner('Consultando la API de GBIF en tiempo real...'):
-        df_bruto = obtener_occurrencias_gbif_directo_gdf(gdf_cliente)
+        # 1. Read shapefile into memory layer
+        bytes_data = io.BytesIO(uploaded_files.read())
+        gdf_cliente = gpd.read_file(bytes_data)
 
-    if not df_bruto.empty:
+        st.success(f'Geometría leida correctamente ({len(gdf_cliente)} polígonos).')
 
-        st.success(f'Análisis completado para {len(df_bruto)} registros válidos')
-        st.write('Muestra del conjunto de datos (10 registros)')
-        st.dataframe(df_bruto[['gbifID','acceptedScientificName','kingdom','class']].head(10))
+        # 2. RUN PIPELINE ONLY ONCE: Check if it was already processed to avoid re-running on widget clicks
+        if st.session_state['df_gbif_bruto'] is None:
+
+            with st.spinner('Consultando la API de GBIF en tiempo real...'):
+                # Execute your query module
+                df_bruto = obtener_occurrencias_gbif_directo_gdf(gdf_cliente)
+
+                # SAVE DIRECTLY TO SESSION STATE
+                st.session_state['df_gbif_bruto'] = df_bruto
+                st.session_state['shp_cargado'] = True
+                st.success(f'Datos descargados e indexados en memoria con éxito para {len(df_bruto)} registros válidos')
+
+                if not df_bruto.empty:
+
+                    #st.success(f'Análisis completado para {len(df_bruto)} registros válidos')
+                    st.write('Muestra del conjunto de datos (20 registros)')
+                    st.dataframe(df_bruto.head(20))
+
+
+        # Propose navigating to the next page smoothly
+        st.info('Vaya a la pestaña ** Lista de especies ** en la barra lateral para ver los análisis.')
+
+    except Exception as e:
+
+        st.error(f'Error al procesar el archivo geoespacial: {e}')
+
+
+# Option to reset memory state if they want to upload a new file
+if st.session_state['shp_cargado']:
+
+    if st.button('Limpiar memoria para cargar otro proyecto'):
+
+        st.session_state['df_gbif_bruto'] = None
+        st.session_state['shp_cargado'] = False
+        st.rerun()
 
 
 

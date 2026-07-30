@@ -1,5 +1,16 @@
 import streamlit as st
 
+
+if 'df_gbif_bruto' not in st.session_state:
+
+	st.session_state['df_gbif_bruto'] = None
+
+if 'shp_cargado' not in st.session_state:
+
+	st.session_state['shp_cargado'] = False
+
+	
+
 pages = [
 	st.Page(
 		'home.py',
