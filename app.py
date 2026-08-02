@@ -1,6 +1,7 @@
 import streamlit as st
 
 
+# Initialize the data frames and state markers
 if 'df_gbif_bruto' not in st.session_state:
 
 	st.session_state['df_gbif_bruto'] = None
@@ -9,8 +10,13 @@ if 'shp_cargado' not in st.session_state:
 
 	st.session_state['shp_cargado'] = False
 
-	
+# Initialize widget memory key
+# We set the default text to match the 2000 meters option
+# if 'buffer_seleccionado' not in st.session_state:
 
+# 	st.session_state['buffer_seleccionado'] = 'Mediano impacto (Vías / Lineas de transmisión / Minería mediana - Buffer: 2000 m)'
+
+# define the multi-page views
 pages = [
 	st.Page(
 		'home.py',

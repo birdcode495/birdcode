@@ -6,7 +6,7 @@ from pygbif import occurrences as occ
 from shapely.ops import orient
 
 
-def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros = 2000, max_registros = 100000):
+def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros = 2000, max_registros = 10000):
 
 	''' Recibe un Geodataframe directamente cargado en memoria, aplica un buffer métrico simplificado basado en la tipología del proyecto
 	óptimo para la API de GBIF minimizando la densidad de vértices y limitando decimales para evitar el error 400, extrae su polígono,	
@@ -62,20 +62,71 @@ def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros = 2000, m
 
 		# ----------------------------------------------------------------------------------------------------------------------
 
+		# IMPLEMENTACIÓN DE PAGINACIÓN AUTOMATIZADA
 
-		# 8. Consultar la API de GBIF en tiempo real
-		resultados_crudos = occ.search(
-			geometry = wkt_string,
-			limit = max_registros
-		)
+		# Targeted backend keys (GBIF internal class codes)
 
-		registros = resultados_crudos.get('results', [])
+		# 212 - Aves, 131 - Amphibia, 359 - Mammalia, 7707728 - Tracheophyta (Vascular plants)
+		clases_prioritarias = [212, 131, 359, 7707728]
 
-		if not registros:
+		todos_los_registros = []
+		limite_pagina = 300  # Máximo estricto permitido por la API de GBIF por llamada espacial
+		# Marcador visual dinámico para la interfaz de Streamlit
+		status_text = st.empty()
 
-			return pd.DataFrame
 
-		return pd.DataFrame(registros)
+		# RUN SMART QUERIES BY TAXONOMIC TARGET GROUP
+
+		for clase_id in clases_prioritarias:
+
+			offset_actual = 0
+
+			while True:
+
+				status_text.text(f'Consulta del lado del servidor GBIF...Clave de clase: {clase_id} | Fila actual: {offset_actual})')
+
+				# Server side optimization: Pass strict constraints inside the request
+				# Realizar la llamada especificando la página de registros correspondientes 
+				respuesta = occ.search(
+					geometry = wkt_string,
+					classKey = clase_id, # Core biological focus
+					year = '2000,2026', # Eradicates pre-GPS historical noise instantly
+					limit = limite_pagina,
+					offset = offset_actual
+				)
+
+				registros_pagina = respuesta.get('results', [])
+				conteo_total_clase = respuesta.get('count', 0) # El total real en los servidores de GBIF
+
+				if not registros_pagina:
+
+					break
+
+				todos_los_registros.extend(registros_pagina)
+
+				# Halt if we extracted all real occurrences for this specific class
+				if len(registros_pagina) < limite_pagina or len(todos_los_registros) >= conteo_total_clase:
+
+					break
+
+				# Hard safely rail per class group to prevent RAM exhaustion
+				if offset_actual >= max_registros:
+
+					break
+
+
+				# Desplazar el puntero para la siguiente página
+				offset_actual = offset_actual + limite_pagina
+
+		status_text.empty() # Limpiar el texto temporal
+
+		if not todos_los_registros:
+
+			return pd.DataFrame()
+
+		df_completo = pd.DataFrame(todos_los_registros)
+		#print(f'Total real en GBIF: {conteo_total_db} | Total descargado con éxito: {len(df_completo)}')
+		return df_completo
 
 
 	except Exception as e:

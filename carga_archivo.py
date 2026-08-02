@@ -20,15 +20,23 @@ with col_init2:
 #with st.form(key = 'upload_button'):
 
 # 1. Componente selector de tipología de impacto (Mapeo de riesgos ASG corporativos)
+#opcion_proyecto = st.radio(
+ #   'Seleccione la categoría y escala del Proyecto a evaluar:',
 opcion_proyecto = st.radio(
     'Seleccione la categoría y escala del Proyecto a evaluar:',
     [
-        'Pequeño impacto (Construcción local / Agricultura menor - Buffer: 1000 m)',
-        'Mediano impacto (Vías / Lineas de transmisión / Minería mediana - Buffer: 2000 m)',
-        'Alto impacto (Macro-minería / Hidrocarburos / Agroindustria pesada - Buffer: 5000 m)'
+    'Pequeño impacto (Construcción local / Agricultura menor - Buffer: 1000 m)',
+    'Mediano impacto (Vías / Lineas de transmisión / Minería mediana - Buffer: 2000 m)',
+    'Alto impacto (Macro-minería / Hidrocarburos / Agroindustria pesada - Buffer: 5000 m)'
     ],
+    index = 1
 
-    index = 1 # Selección predeterminada en 2000 metros
+# Bind widget to session state via the 'key' parameter
+# Streamlit will now read and write directly to st.session_state['buffer_seleccionado']
+# opcion_proyecto = st.radio(
+#     'Seleccione la categoría y escala del Proyecto a evaluar',
+#     options = opciones_buffer,
+#     key = 'buffer_seleccionado'
 )
 
 # Asignación de la distancia métrica según la selección del analista de riesgo
