@@ -67,7 +67,7 @@ def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros = 2000, m
 		# Targeted backend keys (GBIF internal class codes)
 
 		# 212 - Aves, 131 - Amphibia, 359 - Mammalia, 7707728 - Tracheophyta (Vascular plants)
-		clases_prioritarias = [212, 131, 359, 7707728]
+		clases_prioritarias = [212, 131, 359, 7707728, 4334, 7901, 7908, 7911, 4345]
 
 		todos_los_registros = []
 		limite_pagina = 300  # Máximo estricto permitido por la API de GBIF por llamada espacial
