@@ -6,7 +6,7 @@ from pygbif import occurrences as occ
 from shapely.ops import orient
 
 
-def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros = 2000, max_registros = 10000):
+def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros, max_registros = 10000):
 
 	''' Recibe un Geodataframe directamente cargado en memoria, aplica un buffer métrico simplificado basado en la tipología del proyecto
 	óptimo para la API de GBIF minimizando la densidad de vértices y limitando decimales para evitar el error 400, extrae su polígono,	

@@ -21,6 +21,8 @@ def depurar_inventario_gbif(df_raw, anio_corte_gps = 2000, incertidumbre_maxima 
 	columnas_duplicados = ['scientificName', 'decimalLatitude', 'decimalLongitude', 'eventDate']
 	columnas_existentes = [col for col in columnas_duplicados if col in df.columns]
 	df = df.drop_duplicates(subset = columnas_existentes, keep = 'first')
+	drop_count = len(df)
+	print(f'Registros duplicados eliminados: {initial_count - drop_count}')
 
 	# 2. DATA TYPE NORMALIZATION
 	df['year'] = pd.to_numeric(df['year'], errors = 'coerce')
@@ -35,6 +37,8 @@ def depurar_inventario_gbif(df_raw, anio_corte_gps = 2000, incertidumbre_maxima 
 
 	# Combine conditions to extract valid rows
 	df_limpio = df[condicion_incetidumbre_valida | condicion_nulo_pero_moderno]
+	condition_count = len(df_limpio)
+	print(f'Registros por condicion eliminados: {drop_count - condition_count}')
 
 	# 4. EXCLUDE LOW QUALITY OBSERVATION BASES
 	if 'basisOfRecord' in df_limpio.columns:

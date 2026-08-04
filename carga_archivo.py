@@ -2,6 +2,7 @@ import streamlit as st
 import io
 import geopandas as gpd
 from Modules.gbif_pipeline import obtener_occurrencias_gbif_directo_gdf
+from Modules.data_cleaning import depurar_inventario_gbif
 
 
 col_init1, col_init2 = st.columns([2,1])
@@ -72,19 +73,24 @@ if uploaded_files is not None:
 
             with st.spinner('Consultando la API de GBIF en tiempo real...'):
                 # Execute your query module
-                df_bruto = obtener_occurrencias_gbif_directo_gdf(gdf_cliente)
+                df_bruto = obtener_occurrencias_gbif_directo_gdf(gdf_cliente, distancia_buffer)
+
+            # Clean data instantly in memory using GeoPandas / Pandas logic
+            with st.spinner('Ejecutando algoritmos de depuración geoespacial en memoria...'):
+                df_limpio = depurar_inventario_gbif(df_bruto, anio_corte_gps = 2000, incertidumbre_maxima = 2000)
 
                 # SAVE DIRECTLY TO SESSION STATE
-                st.session_state['df_gbif_bruto'] = df_bruto
+                st.session_state['df_gbif_bruto'] = df_limpio
                 st.session_state['shp_cargado'] = True
                 st.success(f'Datos descargados e indexados en memoria con éxito para {len(df_bruto)} registros válidos')
+                st.success(f'Datos limpiados con éxito para {len(df_limpio)} registros depurados')
 
-                if not df_bruto.empty:
+                if not df_limpio.empty:
 
                     #st.success(f'Análisis completado para {len(df_bruto)} registros válidos')
                     st.write('Muestra del conjunto de datos (20 registros)')
-                    st.dataframe(df_bruto.head(20))
-                    st.success(f'buffer {distancia_buffer}')
+                    st.dataframe(df_limpio.head(20))
+                    st.success(f'Se aplicó un buffer o área de influencia sobre el polígono cargado de: {distancia_buffer} metros')
 
 
         # Propose navigating to the next page smoothly
