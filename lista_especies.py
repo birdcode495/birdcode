@@ -35,6 +35,42 @@ with aves:
 					st.dataframe(
 						df_esg_dashboard,
 						column_config = {
+						# 1. TAXONOMIC IDENTIFIERS AND DESCRIPTORS
+						'nombre_cientifico': st.column_config.TextColumn(
+							'Nombre científico',
+							help = 'Binomio taxonómico oficial validado por la API de GBIF'
+							),
+						'orden': st.column_config.TextColumn(
+							'Orden',
+							help = 'Clasificación taxonómica del orden biológico'
+							),
+						'familia': st.column_config.TextColumn(
+							'Familia',
+							help = 'Familia taxonómica correspondiente'
+							),
+						'red_list_category': st.column_config.TextColumn(
+							'Categoría IUCN',
+							help = 'Estado oficial de conservación global (CR, EN, VU, LC)'
+							),
+						# 2. MULTILINGUAL DICTIONARY MATRIX
+						'nombre_comun': st.column_config.TextColumn(
+							'co Nombre Común (ES)',
+							help = 'Nombre común estandarizado en español según el catálogo IOC'
+							),
+						'english_name': st.column_config.TextColumn(
+							'us English Name',
+							help = 'Official standardized avian English identifier'
+							),
+						'chinese_name': st.column_config.TextColumn(
+							'cn Chinese Name',
+							help = 'Official avian identifier in chinese characters'
+							),
+						# 3. STATISITICAL SPATIAL AGGREGATES
+						'registros': st.column_config.NumberColumn(
+							'Conteo Registros',
+							help = 'Número absoluto de ocurrencias geoespaciales detectadas dentro del buffer',
+							format = '%d' # Displays as a clean integer without decimal points
+							),
 						'url_ficha': st.column_config.LinkColumn(
 							'Ficha Técnica',
 							display_text = 'Abrir ficha IUCN',
