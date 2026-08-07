@@ -97,11 +97,13 @@ def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 			DISTINCT g.species AS nombre_cientifico,
 			g.order AS orden,
 			g.family AS familia,
+			assessments_iucn.red_list_category AS red_list_category,
 			COUNT(DISTINCT key) AS registros
 
 		FROM {nombre_tabla_temp} g
+		LEFT JOIN assessments_iucn ON g.species = assessments_iucn.scientific_name
 		WHERE g.species IS NOT NULL AND g.class = 'Aves'
-		GROUP BY nombre_cientifico, orden, familia
+		GROUP BY nombre_cientifico, orden, familia, red_list_category
 		ORDER BY registros DESC;'''
 
 	with engine.connect() as con:
