@@ -98,18 +98,23 @@ def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 			g.order AS orden,
 			g.family AS familia,
 			assessments_iucn.red_list_category AS red_list_category,
+			multilingual_ioc.spanish AS nombre_comun,
+			multilingual_ioc.english AS english_name,
+			multilingual_ioc.chinese AS chinese_name,
 			COUNT(DISTINCT key) AS registros
 
 		FROM {nombre_tabla_temp} g
 		LEFT JOIN assessments_iucn ON g.species = assessments_iucn.scientific_name
+		LEFT JOIN multilingual_ioc ON g.species = multilingual_ioc.species
 		WHERE g.species IS NOT NULL AND g.class = 'Aves'
-		GROUP BY nombre_cientifico, orden, familia, red_list_category
+		GROUP BY nombre_cientifico, orden, familia, red_list_category, nombre_comun, english_name, chinese_name
 		ORDER BY registros DESC;'''
 
 	with engine.connect() as con:
 
 		# Load the complete joined SQL result instantly into a fresh pandas table matrix
 		df_esg_final = pd.read_sql_query(text(query_sql), con)
+		#st.write('Columnas crudas entregadas por SQL', list(df_esg_final.columns))
 
 		# MANDATORY BANK SECURITY CLOSURE (No persistencia en disco NDA Rule)
 		# Erase the transient spatial points completely from the cloud schema right after evaluation
