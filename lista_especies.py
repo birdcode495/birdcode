@@ -32,6 +32,7 @@ with aves:
 
 					# Step 3: Print out the final database output
 					st.subheader('Consolidado de estadísticas de biodiversidad emitido por el servidor PostgreSQL')
+					st.metric(label = 'Total especies de aves detectadas', value = len(df_esg_dashboard))
 					st.dataframe(
 						df_esg_dashboard,
 						column_config = {
