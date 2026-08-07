@@ -86,7 +86,7 @@ def cargar_dataframe_sesion_a_supabase(id_solicitud_banco):
 
 
 
-def ejecutar_analisis_esg_postgis(nombre_tabla_temp):
+def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 
 	''' Runs multi-layer relational queries inside Supabase to extract local threat metrics'''
 	engine = obtener_motor_supa()
@@ -95,12 +95,13 @@ def ejecutar_analisis_esg_postgis(nombre_tabla_temp):
 
 		SELECT
 			DISTINCT g.species AS nombre_cientifico,
+			g.order AS orden,
 			g.family AS familia,
 			COUNT(DISTINCT key) AS registros
 
 		FROM {nombre_tabla_temp} g
-		WHERE g.species IS NOT NULL
-		GROUP BY nombre_cientifico, familia
+		WHERE g.species IS NOT NULL AND g.class = 'Aves'
+		GROUP BY nombre_cientifico, orden, familia
 		ORDER BY registros DESC;'''
 
 	with engine.connect() as con:

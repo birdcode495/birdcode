@@ -1,32 +1,38 @@
 import streamlit as st
 import pandas as pd
-from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis
+from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis_aves
 
 
 st.header('Inteligencia avanzada para diagnósticos de biodiversidad')
+aves, aves_endemicas, mamiferos, plantas_vasculares, polinizadores, frutales_exoticos, orquideas = st.tabs([
+	'Consulta de Aves', 'Aves endémicas', 'Mamíferos', 'Plantas vasculares', 'Polinizadores', 'Frutales exóticos', 'Orquideas'])
 
-if st.session_state.get('shp_cargado', False) and st.session_state['df_gbif_bruto'] is not None:
+with aves:
 
-	# Establish an arbitrary corporate credit ID for tracking
-	id_credito_actual = 'credito_bogota_2026_99'
+	st.subheader('Diagnóstico de biodiversidad de aves en polígono consultado:')
 
-	if st.button('Iniciar analisis de riesgo territorial'):
+	if st.session_state.get('shp_cargado', False) and st.session_state['df_gbif_bruto'] is not None:
 
-		with st.spinner('Estableciendo tunel TLS seguro e ingiriendo datos vectoriales...'):
+		# Establish an arbitrary corporate credit ID for tracking
+		id_credito_actual = 'credito_bogota_2026_99'
 
-			# Step 1: Dump data from browser session memory to supabase
-			tabla_generada = cargar_dataframe_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
+		if st.button('Iniciar analisis de riesgo territorial'):
 
-			if tabla_generada:
+			with st.spinner('Estableciendo tunel TLS seguro e ingiriendo datos vectoriales...'):
 
-				# Step 2: Run the analytical PostGIS query layer and auto-drop tables
-				with st.spinner('Ejecutando consultas de biodiversidad...'):
+				# Step 1: Dump data from browser session memory to supabase
+				tabla_generada = cargar_dataframe_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
 
-					df_esg_dashboard = ejecutar_analisis_esg_postgis(tabla_generada)
+				if tabla_generada:
 
-				# Step 3: Print out the final database output
-				st.subheader('Consolidado de estadísticas de biodiversidad emitido por el servidor PostgreSQL')
-				st.dataframe(df_esg_dashboard, use_container_width = True)
+					# Step 2: Run the analytical PostGIS query layer and auto-drop tables
+					with st.spinner('Ejecutando consultas de biodiversidad...'):
+
+						df_esg_dashboard = ejecutar_analisis_esg_postgis_aves(tabla_generada)
+
+					# Step 3: Print out the final database output
+					st.subheader('Consolidado de estadísticas de biodiversidad emitido por el servidor PostgreSQL')
+					st.dataframe(df_esg_dashboard, use_container_width = True)
 
 
 
