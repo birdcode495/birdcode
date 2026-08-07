@@ -32,7 +32,22 @@ with aves:
 
 					# Step 3: Print out the final database output
 					st.subheader('Consolidado de estadísticas de biodiversidad emitido por el servidor PostgreSQL')
-					st.dataframe(df_esg_dashboard, use_container_width = True)
+					st.dataframe(
+						df_esg_dashboard,
+						column_config = {
+						'url_ficha': st.column_config.LinkColumn(
+							'Ficha Técnica',
+							display_text = 'Abrir ficha IUCN',
+							help = 'Enlace externo verificado al perfil biológico de la especie'
+							),
+						'mapa': st.column_config.LinkColumn(
+							'Rango Geográfico',
+							display_text = 'Ver distribución',
+							help = 'Consulta a mapa en formato JPG'
+							)
+						},
+						use_container_width = True,
+						hide_index = True)
 
 
 
