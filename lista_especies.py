@@ -204,6 +204,31 @@ with restricciones:
 							**Acción Requerida**: Condicionar los desembolsos de capital a la entrega de la Licencia Ambiental en firme y al Plan de Compensación de Biodiversidad con Ganancia Neta validado por la CAR local.
 							''')
 
+					# 3. AUTOMATION PROCESS: STANDARD MONITORING ALERT (Near Threatened)
+					# Define tracking thresholds for low/medium vulnerability categories (Umbrella species)
+					categorias_azules = ['NT', 'Near Threatened', 'Casi Amenazado']
+
+					df_azul = df_esg_dashboard[df_esg_dashboard['red_list_category'].str.contains('|'.join(categorias_azules), na = False)]
+					conteo_azul = len(df_azul)
+
+					if conteo_azul > 0:
+
+						st.info(f'''
+							**NOTA DE MONITOREO**: Especies de alta sensibilidad ecológica (Especies Paraguas)**
+							**Estatus**: Se detectó la presencia potencial de **{conteo_azul}** especies en categoría **Casi Amenazada (NT)** dentro del buffer de influencia.
+							**Impacto Operativo**: No genera bloqueos regulatorios inmediatos, pero representa poblaciones altamente propensas a escalar en peligro si el diseño de ingeniería altera corredores de conectividad local.
+							**Acción Requerida**: Requerir formalmente al cliente la inclusión de protocolos de ahuyentamiento de fauna y el diseño de pasos de fauna estructurados en sus Planes de Manejo Ambiental (PMA).
+							''' )
+
+					# If the system sweeps the dataset and finds absolutely zero risks, provide clear feedback to the user
+					if conteo_orquideas == 0 and conteo_amarillo == 0 and conteo_azul == 0:
+
+						st.success('**Cumplimiento Ambiental Inicial Satisfecho**: El área de influencia evaluada no presenta coincidencia de registros históricos con Vedas Nacionales de epífitas o Hábitats Críticos globales de la Lista Roja de la IUCN.')
+
+				else:
+
+					st.warning('Cargue un polígono e inicie el prediagnóstico para poblar la matriz automatizada de riesgos')
+
 
 
 
