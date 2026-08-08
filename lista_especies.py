@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis_aves, ejecutar_analisis_esg_postgis_restricciones
+from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis_aves
+from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis_restricciones
 
 
 st.header('Inteligencia avanzada para diagnósticos de biodiversidad')
