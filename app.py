@@ -73,23 +73,23 @@ with st.sidebar.container(height=310):
 
     	st.page_link('login.py', label = 'Login')
 
-    elif page.title == 'Locate':
+    elif page.title == 'Paso 1: Locate':
 
         st.page_link("carga_archivo.py", label = 'LEAP: Locate')
 
-    elif page.title == 'Lista de especies':
+    elif page.title == 'Paso 2: Evaluate & Assess':
 
-        st.page_link('lista_especies.py', label = 'Evaluate, Assess and Prepare')
+        st.page_link('lista_especies.py', label = 'Evaluate & Assess')
 
-    elif page.title == 'Lista de especies amenazadas':
+    elif page.title == 'Paso 3: Prepare':
 
-        st.page_link('lista_especies_amenazadas.py', label = 'Lista de especies amenazadas')
+        st.page_link('lista_especies_amenazadas.py', label = 'Prepare')
 
-    elif page.title == 'Mapa de distribución':
+    elif page.title == 'Mapa de Distribución Geoespacial':
 
         st.page_link('mapa.py', label = 'Mapa de distribución')
 
-    elif page.title == 'Descarga informe':
+    elif page.title == 'Informe de Cumplimiento TNFD':
 
         st.page_link('informe.py', label = 'Descargar informe')
 
