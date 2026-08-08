@@ -46,6 +46,7 @@ def depurar_inventario_gbif(df_raw, anio_corte_gps = 2000, incertidumbre_maxima 
 		excluir_basis = ['FOSSIL_SPECIMEN', 'LIVING_SPECIMEN']
 		df_limpio = df_limpio[~df_limpio['basisOfRecord'].isin(excluir_basis)]
 
+	df_limpio.columns = df_limpio.columns.str.lower()
 	final_count = len(df_limpio)
 	print(f'Data cleaning complete: filtered out {initial_count - final_count} noise records')
 

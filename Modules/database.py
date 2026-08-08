@@ -56,9 +56,11 @@ def cargar_dataframe_sesion_a_supabase(id_solicitud_banco):
 		# GBIF coordinates are natively stored in geographic WGS84 format (EPSG:4326)
 		gdf_upload = gpd.GeoDataFrame(
 			df_temp,
-			geometry = gpd.points_from_xy(df_temp['decimalLongitude'], df_temp['decimalLatitude']),
+			geometry = gpd.points_from_xy(df_temp['decimallongitude'], df_temp['decimallatitude']),
 			crs = 'EPSG:4326'
 		)
+
+		#gdf_upload.columns = gdf_upload.columns.str.lower()
 
 		# Build an enterprise-safe isolated table name using the unique banking loan transaction ID
 		nombre_tabla_destino = f'temp_analisis_{id_solicitud_banco}'
@@ -105,13 +107,14 @@ def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 
 			-- Dynamic SQL URL generation (Consumes zero database disk space)
 			'https://www.iucnredlist.org/species/' || assessments_iucn.internal_taxon_id || '/' || assessments_iucn.assessment_id AS url_ficha,
-			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa
+			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa,
+			'https://www.gbif.org/occurrence/search?taxonKey=' || g.taxonkey || '&view=gallery' AS gallery
 
 		FROM {nombre_tabla_temp} g
 		LEFT JOIN assessments_iucn ON g.species = assessments_iucn.scientific_name
 		LEFT JOIN multilingual_ioc ON g.species = multilingual_ioc.species
 		WHERE g.species IS NOT NULL AND g.class = 'Aves'
-		GROUP BY nombre_cientifico, orden, familia, red_list_category, nombre_comun, english_name, chinese_name, url_ficha, mapa
+		GROUP BY nombre_cientifico, orden, familia, red_list_category, nombre_comun, english_name, chinese_name, url_ficha, mapa, gallery
 		ORDER BY registros DESC;'''
 
 	with engine.connect() as con:
@@ -125,7 +128,47 @@ def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
 		con.commit()
 
-	return df_esg_final 
+	return df_esg_final
+
+
+
+def ejecutar_analisis_esg_postgis_restricciones(nombre_tabla_temp):
+
+	''' Runs multi-layer relational queries inside Supabase to extract local threat metrics'''
+	engine = obtener_motor_supa()
+
+	query_sql = f'''
+
+		SELECT
+			DISTINCT g.species AS nombre_cientifico,
+			g.order AS orden,
+			g.family AS familia,
+			assessments_iucn.red_list_category AS red_list_category,
+			COUNT(DISTINCT key) AS registros,
+
+			-- Dynamic SQL URL generation (Consumes zero database disk space)
+			'https://www.iucnredlist.org/species/' || assessments_iucn.internal_taxon_id || '/' || assessments_iucn.assessment_id AS url_ficha,
+			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa
+
+		FROM {nombre_tabla_temp} g
+		LEFT JOIN assessments_iucn ON g.species = assessments_iucn.scientific_name
+		WHERE g.species IS NOT NULL AND (g.family = 'Orchidaceae' OR g.class = 'Mammalia' OR g.kingdom = 'Plantae')
+		GROUP BY nombre_cientifico, orden, familia, red_list_category, url_ficha, mapa
+		ORDER BY registros DESC;'''
+
+	with engine.connect() as con:
+
+		# Load the complete joined SQL result instantly into a fresh pandas table matrix
+		df_esg_restricciones = pd.read_sql_query(text(query_sql), con)
+		#st.write('Columnas crudas entregadas por SQL', list(df_esg_final.columns))
+
+		# MANDATORY BANK SECURITY CLOSURE (No persistencia en disco NDA Rule)
+		# Erase the transient spatial points completely from the cloud schema right after evaluation
+		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
+		con.commit()
+
+	return df_esg_restricciones 
+
 
 
 

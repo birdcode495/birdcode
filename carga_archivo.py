@@ -82,6 +82,7 @@ if uploaded_files is not None:
                 # SAVE DIRECTLY TO SESSION STATE
                 st.session_state['df_gbif_bruto'] = df_limpio
                 st.session_state['shp_cargado'] = True
+                st.session_state['ultima_distancia'] = distancia_buffer
                 st.success(f'Datos descargados e indexados en memoria con éxito para {len(df_bruto)} registros válidos')
                 st.success(f'Datos limpiados con éxito para {len(df_limpio)} registros depurados')
 
