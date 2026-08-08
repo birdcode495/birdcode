@@ -23,14 +23,34 @@ with col_init2:
 # 1. Componente selector de tipología de impacto (Mapeo de riesgos ASG corporativos)
 #opcion_proyecto = st.radio(
  #   'Seleccione la categoría y escala del Proyecto a evaluar:',
-opcion_proyecto = st.radio(
-    'Seleccione la categoría y escala del Proyecto a evaluar:',
-    [
-    'Pequeño impacto (Construcción local / Agricultura menor - Buffer: 1000 m)',
-    'Mediano impacto (Vías / Lineas de transmisión / Minería mediana - Buffer: 2000 m)',
-    'Alto impacto (Macro-minería / Hidrocarburos / Agroindustria pesada - Buffer: 5000 m)'
-    ],
+
+# Modifica el espacio vertical entre cada opción (ajusta '2.5rem' a tu gusto)
+st.markdown("""
+    <style>
+    [role=radiogroup] {
+        gap: 1.5rem; 
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Tu radio normal
+opcion_proyecto = st.radio("Elige una opción:", ['Pequeño impacto (Construcción local / Agricultura menor - Buffer: 1000 m)', 
+    'Mediano impacto (Vías / Lineas de transmisión / Minería mediana - Buffer: 2000 m)', 
+    'Alto impacto (Macro-minería / Hidrocarburos / Agroindustria pesada - Buffer: 5000 m)'],
     index = 1
+    )
+
+
+
+
+# opcion_proyecto = st.radio(
+#     'Seleccione la categoría y escala del Proyecto a evaluar:',
+#     [
+#     'Pequeño impacto (Construcción local / Agricultura menor - Buffer: 1000 m)',
+#     'Mediano impacto (Vías / Lineas de transmisión / Minería mediana - Buffer: 2000 m)',
+#     'Alto impacto (Macro-minería / Hidrocarburos / Agroindustria pesada - Buffer: 5000 m)'
+#     ],
+#     index = 1
 
 # Bind widget to session state via the 'key' parameter
 # Streamlit will now read and write directly to st.session_state['buffer_seleccionado']
@@ -38,7 +58,7 @@ opcion_proyecto = st.radio(
 #     'Seleccione la categoría y escala del Proyecto a evaluar',
 #     options = opciones_buffer,
 #     key = 'buffer_seleccionado'
-)
+#)
 
 # Asignación de la distancia métrica según la selección del analista de riesgo
 if '1000 m' in opcion_proyecto:
@@ -54,6 +74,8 @@ else:
     distancia_buffer = 5000
 
 
+
+st.write('')
 uploaded_files = st.file_uploader("Suba el archivo .zip de su shapefile o archivo Geojson/KML: ",  
     type=['zip', 'geojson', 'kml', ]
 )

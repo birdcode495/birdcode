@@ -5,8 +5,8 @@ from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analis
 
 
 st.header('Inteligencia avanzada para diagnósticos de biodiversidad')
-aves, restricciones, dependencias, oportunidades = st.tabs([
-	'Consulta de Aves', 'Riesgos de veda y hábitat', 'Dependencias de soporte', 'Oportunidades de crédito verde'])
+aves, dependencias, restricciones = st.tabs([
+	'Diagnóstico General', 'Evaluate: Dependencias de Soporte', 'Assess: Restricciones de Veda y Hábitat'])
 
 with aves:
 
@@ -96,7 +96,7 @@ with aves:
 
 with restricciones:
 
-	st.subheader('Diagnóstico de presencia de orquideas, mamíferos y plantas')
+	st.subheader('Valoración de riesgos y alertas')
 
 	if st.session_state.get('shp_cargado', False) and st.session_state['df_gbif_bruto'] is not None:
 

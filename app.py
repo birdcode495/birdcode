@@ -30,27 +30,27 @@ pages = [
 		),
 	st.Page(
 		'carga_archivo.py',
-		title = 'Carga tu archivo',
+		title = 'Paso 1: Locate',
 		icon = ':material/upload_file:'
 		),
 	st.Page(
 		'lista_especies.py',
-		title = 'Lista de especies',
+		title = 'Paso 2: Evaluate & Assess',
 		icon = ':material/local_florist:'
 		),
 	st.Page(
 		'lista_especies_amenazadas.py',
-		title = 'Lista de especies amenazadas',
+		title = 'Paso 3: Prepare',
 		icon = ':material/star:'
 		),
 	st.Page(
 		'mapa.py',
-		title = 'Mapa de distribución',
+		title = 'Mapa de Distribución Geoespacial',
 		icon = ':material/public:'
 		),
 	st.Page(
 		'informe.py',
-		title = 'Descarga informe',
+		title = 'Informe de Cumplimiento TNFD',
 		icon = ':material/analytics:'
 		)
 
@@ -67,18 +67,19 @@ with st.sidebar.container(height=310):
     if page.title == 'Home':
 
         st.page_link("home.py", label = 'Home')
+        st.write('Por medio de esta página de inicio puedes navegar a las distintas secciones de la App BirdCode')
 
     elif page.title == 'Login':
 
     	st.page_link('login.py', label = 'Login')
 
-    elif page.title == 'Carga tu archivo':
+    elif page.title == 'Locate':
 
-        st.page_link("carga_archivo.py", label = 'Carga tu archivo')
+        st.page_link("carga_archivo.py", label = 'LEAP: Locate')
 
     elif page.title == 'Lista de especies':
 
-        st.page_link('lista_especies.py', label = 'Lista de especies')
+        st.page_link('lista_especies.py', label = 'Evaluate, Assess and Prepare')
 
     elif page.title == 'Lista de especies amenazadas':
 
