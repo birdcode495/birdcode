@@ -192,6 +192,12 @@ else:
 					muestra una tasa de recuperación del **{int(valores_regenerativo[-1] - 100)}%**. Este incremento califica al proyecto agropecuario para ser titular de **Créditos de Biodiversidad** transables.
 				''')
 
+				if st.button('🧹 Limpiar análisis actual'):
+
+					st.session_state['df_postgis_resultado'] = None
+					st.session_state['analisis_ejecutado'] = False
+					st.rerun()
+
 
 
 
