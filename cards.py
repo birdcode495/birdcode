@@ -19,7 +19,7 @@ def lista_especies():
 	st.image('Images/Endangered_species.png', width = 270, use_container_width = True)
 
 
-def especies_amenazadas():
+def prepare():
 
 	st.page_link('prepare.py', label = 'Prepare: Oportunidades de Crédito Verde', icon = ':material/star:')
 	st.image('Images/Eagle3.png', width = 240, use_container_width = True)
