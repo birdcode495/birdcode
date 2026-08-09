@@ -189,7 +189,12 @@ def ejecutar_analisis_esg_postgis_prepare(nombre_tabla_temp):
 
 			-- Dynamic SQL URL generation (Consumes zero database disk space)
 			'https://www.iucnredlist.org/species/' || assessments_iucn.internal_taxon_id || '/' || assessments_iucn.assessment_id AS url_ficha,
-			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa
+			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa,
+
+			-- Pulling the categorical scenario tokens from your endemic reference schema
+			aves_endemicas.tendencia_base AS tendencia_base,
+			aves_endemicas.tendencia_extractivista AS tendencia_extrativista,
+			aves_endemicas.tendencia_verde AS tendencia_verde
 
 		FROM {nombre_tabla_temp} g
 		INNER JOIN aves_endemicas
@@ -199,7 +204,7 @@ def ejecutar_analisis_esg_postgis_prepare(nombre_tabla_temp):
 		LEFT JOIN assessments_iucn
 			ON g.species = assessments_iucn.scientific_name
 		WHERE g.class = 'Aves'
-		GROUP BY 1,2,3,4,5,6,7,9,10
+		GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13
 		ORDER BY 8 DESC;'''
 
 	with engine.connect() as con:
