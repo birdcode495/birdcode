@@ -167,7 +167,58 @@ def ejecutar_analisis_esg_postgis_restricciones(nombre_tabla_temp):
 		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
 		con.commit()
 
-	return df_esg_restricciones 
+	return df_esg_restricciones
+
+
+def ejecutar_analisis_esg_postgis_prepare(nombre_tabla_temp):
+
+	''' Runs multi-layer relational queries inside Supabase to extract local threat metrics'''
+	engine = obtener_motor_supa()
+
+	query_sql2 = f'''
+
+		SELECT
+			DISTINCT g.species AS nombre_cientifico,
+			multilingual_ioc.spanish AS nombre_comun_es,
+			multilingual_ioc.english AS nombre_comun_en,
+			multilingual_ioc.french AS nombre_comun_fr,
+			multilingual_ioc.chinese AS nombre_comun_cn,
+			g.family AS familia,
+			aves_endemicas.categoria_iucn AS red_list_category,
+			COUNT(DISTINCT key) AS registros,
+
+			-- Dynamic SQL URL generation (Consumes zero database disk space)
+			'https://www.iucnredlist.org/species/' || assessments_iucn.internal_taxon_id || '/' || assessments_iucn.assessment_id AS url_ficha,
+			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa
+
+		FROM {nombre_tabla_temp} g
+		INNER JOIN aves_endemicas
+			ON LOWER(TRIM(g.species)) = LOWER(TRIM(aves_endemicas.especie))
+		LEFT JOIN multilingual_ioc 
+			ON g.species = multilingual_ioc.species
+		LEFT JOIN assessments_iucn
+			ON g.species = assessments_iucn.scientific_name
+		WHERE g.class = 'Aves'
+		GROUP BY 1,2,3,4,5,6,7,9,10
+		ORDER BY 8 DESC;'''
+
+	with engine.connect() as con:
+
+		# Load the complete joined SQL result instantly into a fresh pandas table matrix
+		df_esg_prepare = pd.read_sql_query(text(query_sql2), con)
+		#st.write('Columnas crudas entregadas por SQL', list(df_esg_final.columns))
+
+		# MANDATORY BANK SECURITY CLOSURE (No persistencia en disco NDA Rule)
+		# Erase the transient spatial points completely from the cloud schema right after evaluation
+		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
+		con.commit()
+
+	return df_esg_prepare
+
+
+
+
+
 
 
 

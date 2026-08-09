@@ -39,7 +39,7 @@ pages = [
 		icon = ':material/local_florist:'
 		),
 	st.Page(
-		'lista_especies_amenazadas.py',
+		'prepare.py',
 		title = 'Paso 3: Prepare',
 		icon = ':material/star:'
 		),
@@ -83,7 +83,7 @@ with st.sidebar.container(height=310):
 
     elif page.title == 'Paso 3: Prepare':
 
-        st.page_link('lista_especies_amenazadas.py', label = 'Prepare')
+        st.page_link('prepare.py', label = 'Prepare')
 
     elif page.title == 'Mapa de Distribución Geoespacial':
 
