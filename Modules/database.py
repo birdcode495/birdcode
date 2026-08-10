@@ -221,13 +221,3 @@ def ejecutar_analisis_esg_postgis_prepare(nombre_tabla_temp):
 	return df_esg_prepare
 
 
-
-
-
-
-
-
-
-
-
-

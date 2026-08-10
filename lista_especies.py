@@ -2,13 +2,14 @@ import streamlit as st
 import pandas as pd
 from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis_aves
 from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_analisis_esg_postgis_restricciones
+from Modules.locality_audit import generar_tabla_audit_localidades
 
 
 st.header('Inteligencia avanzada para diagnósticos de biodiversidad')
-aves, dependencias, restricciones = st.tabs([
-	'Diagnóstico General', 'Evaluate: Dependencias de Soporte', 'Assess: Restricciones de Veda y Hábitat'])
+general, dependencias, restricciones, localidades = st.tabs([
+	'Diagnóstico General', 'Evaluate: Dependencias de Soporte', 'Assess: Restricciones de Veda y Hábitat', 'Localidades Críticas'])
 
-with aves:
+with general:
 
 	st.subheader('Diagnóstico de biodiversidad de aves en polígono consultado:')
 
@@ -228,6 +229,45 @@ with restricciones:
 				else:
 
 					st.warning('Cargue un polígono e inicie el prediagnóstico para poblar la matriz automatizada de riesgos')
+
+
+
+with localidades:
+
+	st.subheader('🗺️ Auditoría de Puntos de Muestreo Histórico y Localidades Críticas')
+	st.info('💡 **Garantía de Debida Diligencia**: La siguiente tabla consolida las localidades con mayor intensidad de muestreo científico dentro del buffer del Proyecto. Use esta matriz para confrontar la rigurosidad del EIA radicado por el cliente.')
+
+	# Pull the active clean dataset from state memory
+	if st.session_state.get('df_gbif_bruto') is not None:
+
+		df_limpio_global = st.session_state['df_gbif_bruto']
+
+		with st.spinner('Compilando matriz de localidades geoespaciales...'):
+
+			df_top_localidades = generar_tabla_audit_localidades(df_limpio_global, top_n = 25)
+
+		if not df_top_localidades.empty:
+
+			# Render the custom data grid configuring metric data types perfectly
+			st.dataframe(
+				df_top_localidades,
+				column_config = {
+				'Localidad Detectada': st.column_config.TextColumn('📍 Nombre de Localidad / Vereda'),
+				'Registros Totales (Avistamientos)': st.column_config.NumberColumn('🔢 Total Avistamientos', format = '%d 📊'),
+				'Riqueza de Especies Únicas': st.column_config.NumberColumn('🧬 Especies Totales', format = '%d'),
+				'Especies Amenazadas (CR/EN/VU)': st.column_config.NumberColumn('🚨 Especies en Riesgo', format = '%d 🔴'),
+				'Latitud': st.column_config.NumberColumn('North (Lat)', format = '%.4f'),
+				'Longitud': st.column_config.NumberColumn('West (Lng)', format = '%.4f')
+				},
+				use_container_width = True,
+				hide_index = True
+			)
+
+
+
+
+
+
 
 
 
