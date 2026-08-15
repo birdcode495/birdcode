@@ -76,6 +76,7 @@ def generar_tabla_audit_localidades(df_cleaned, top_n = 25):
 		return pd.DataFrame()
 
 	# Rank the table by total sampling volume to show the highest-intensity hotspots first
-	df_ranking = df_localidades.sort_values(by = 'Registros Totales (Avistamientos)', ascending = False)
+	df_ranking = df_localidades.sort_values(by = ['Especies Amenazadas (CR/EN/VU)', 'Registros Totales (Avistamientos)'],
+		ascending = [False, False]).head(top_n)
 
 	return df_ranking

@@ -97,24 +97,22 @@ def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 
 		SELECT
 			DISTINCT g.species AS nombre_cientifico,
+			g.kingdom AS kingdom,
+			g.class AS class,
 			g.order AS orden,
 			g.family AS familia,
 			assessments_iucn.red_list_category AS red_list_category,
-			multilingual_ioc.spanish AS nombre_comun,
-			multilingual_ioc.english AS english_name,
-			multilingual_ioc.chinese AS chinese_name,
 			COUNT(DISTINCT key) AS registros,
 
 			-- Dynamic SQL URL generation (Consumes zero database disk space)
 			'https://www.iucnredlist.org/species/' || assessments_iucn.internal_taxon_id || '/' || assessments_iucn.assessment_id AS url_ficha,
-			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa,
-			'https://www.gbif.org/occurrence/search?taxonKey=' || g.taxonkey || '&view=gallery' AS gallery
-
+			'https://www.iucnredlist.org/api/v4/assessments/' || assessments_iucn.assessment_id || '/distribution_map/jpg' AS mapa
+			
 		FROM {nombre_tabla_temp} g
 		LEFT JOIN assessments_iucn ON g.species = assessments_iucn.scientific_name
-		LEFT JOIN multilingual_ioc ON g.species = multilingual_ioc.species
-		WHERE g.species IS NOT NULL AND g.class = 'Aves'
-		GROUP BY nombre_cientifico, orden, familia, red_list_category, nombre_comun, english_name, chinese_name, url_ficha, mapa, gallery
+		WHERE g.species IS NOT NULL AND assessments_iucn.red_list_category <> 'Least Concern' 
+		AND assessments_iucn.red_list_category <> 'Data Deficient' AND assessments_iucn.red_list_category <> 'Lower Risk/least concern'
+		GROUP BY nombre_cientifico, kingdom, class, orden, familia, red_list_category, url_ficha, mapa
 		ORDER BY registros DESC;'''
 
 	with engine.connect() as con:

@@ -34,7 +34,7 @@ with general:
 
 					# Step 3: Print out the final database output
 					st.subheader('Consolidado de estadísticas de biodiversidad emitido por el servidor PostgreSQL')
-					st.metric(label = 'Total especies de aves detectadas', value = len(df_esg_dashboard))
+					st.metric(label = 'Total especies con amenaza detectadas', value = len(df_esg_dashboard))
 					st.dataframe(
 						df_esg_dashboard,
 						column_config = {
@@ -42,6 +42,14 @@ with general:
 						'nombre_cientifico': st.column_config.TextColumn(
 							'Nombre científico',
 							help = 'Binomio taxonómico oficial validado por la API de GBIF'
+							),
+						'kingdom': st.column_config.TextColumn(
+							'Reino',
+							help = 'Reino taxonómico'
+							),
+						'class': st.column_config.TextColumn(
+							'Clase',
+							help = 'Clase taxonómica'
 							),
 						'orden': st.column_config.TextColumn(
 							'Orden',
@@ -55,19 +63,7 @@ with general:
 							'Categoría IUCN',
 							help = 'Estado oficial de conservación global (CR, EN, VU, LC)'
 							),
-						# 2. MULTILINGUAL DICTIONARY MATRIX
-						'nombre_comun': st.column_config.TextColumn(
-							'co Nombre Común (ES)',
-							help = 'Nombre común estandarizado en español según el catálogo IOC'
-							),
-						'english_name': st.column_config.TextColumn(
-							'us English Name',
-							help = 'Official standardized avian English identifier'
-							),
-						'chinese_name': st.column_config.TextColumn(
-							'cn Chinese Name',
-							help = 'Official avian identifier in chinese characters'
-							),
+						
 						# 3. STATISITICAL SPATIAL AGGREGATES
 						'registros': st.column_config.NumberColumn(
 							'Conteo Registros',
@@ -83,11 +79,6 @@ with general:
 							'Rango Geográfico',
 							display_text = 'Ver distribución',
 							help = 'Consulta a mapa en formato JPG'
-							),
-						'gallery': st.column_config.LinkColumn(
-							'Galería',
-							display_text = 'Ver galería',
-							help = 'Consulta a galería en GBIF'
 							)
 						},
 						use_container_width = True,
