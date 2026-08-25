@@ -100,32 +100,34 @@ def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco):
 
 	df_origen_pol = st.session_state['df_buffer_cliente']
 
-	if df_origen_pol.empty:
+	# if df_origen_pol.empty:
 
-		return None
+	# 	return None
 
 	try:
 
 		# Create a deep copy to prevent mutating the user's active session display matrix
-		df_temp = df_origen_pol.copy()
+		df_temp = df_origen_pol
 
 		# 2. DATA CLEANING AND RE-TYPING (Crucial to avoid PostgreSQL datatype crashes)
 		# Convert any nested JSON dictionaries/lists from the GBIF API payload into basic strings
-		for col in df_temp.columns:
+		# for col in df_temp.columns:
 
-			if df_temp[col].apply(lambda x: isinstance(x, (list, dict))).any():
+		# 	if df_temp[col].apply(lambda x: isinstance(x, (list, dict))).any():
 
-				df_temp[col] = df_temp[col].astype(str)
+		# 		df_temp[col] = df_temp[col].astype(str)
 
 		
 
 		# Build an enterprise-safe isolated table name using the unique banking loan transaction ID
 		nombre_tabla_destino = f'temp_analisis_{id_solicitud_banco}'
 
+		gdf_temp = gpd.GeoDataFrame(geometry = [df_temp], crs = 'EPSG:9377')
+
 		# 4. EXECUTE CLOUD EXPORT VIA GEOALCHEMY
 		engine = obtener_motor_supa()
 
-		st.info(f'Connecting to Supabase Cloud Server...uploading {len(gdf_temp)} rows to table {nombre_tabla_destino}')
+		st.info(f'Connecting to Supabase Cloud Server...uploading rows to table {nombre_tabla_destino}')
 
 		# Geopandas generates the table infrastructure and PostGIS indices automatically
 		gdf_temp.to_postgis(
@@ -135,7 +137,7 @@ def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco):
 			index = False
 		)
 
-		st.success(f'Data pipeline complete. Ingestion table {nombre_tabla_destino} is now fully queryable via SQL.')
+		st.success(f'Procesamiento de datos completado.La tabla {nombre_tabla_destino} está disponible ahora para realizar consultas SQL.')
 		return nombre_tabla_destino
 
 	except Exception as e:
@@ -285,8 +287,8 @@ def ejecutar_motor_alertas_tnfd(nombre_tabla_temp):
 
 		SELECT
 
-			DISTINCT g.species AS nombre_cientifico,
-			g.family AS familia,
+			-- DISTINCT g.species AS nombre_cientifico,
+			-- g.family AS familia,
 			--- Interseccion con paramos (MinAmbiente)
 			EXISTS (
 				SELECT 1 FROM paramos p

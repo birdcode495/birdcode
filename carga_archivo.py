@@ -3,7 +3,7 @@ import io
 import geopandas as gpd
 from Modules.gbif_pipeline import obtener_occurrencias_gbif_directo_gdf
 from Modules.data_cleaning import depurar_inventario_gbif
-from Modules.database import cargar_dataframe_sesion_a_supabase, ejecutar_motor_alertas_tnfd 
+from Modules.database import cargar_dataframe_pol_sesion_a_supabase, ejecutar_motor_alertas_tnfd 
 
 
 l1, l2, l3, l4 = st.tabs(['L1: Huella empresarial', 'L2: Interfaz con la naturaleza', 'L3: Ubicación prioritaria', 
@@ -85,6 +85,9 @@ with l1:
                     st.session_state['shp_cargado'] = True
                     st.session_state['ultima_distancia'] = distancia_buffer
                     st.session_state['df_buffer_cliente'] = df_pol
+
+                    if st.session_state['df_buffer_cliente'] is not None:
+                        st.success(f'Poligono cargado a session state')
                     st.success(f'Datos descargados e indexados en memoria con éxito para {len(df_bruto)} registros válidos')
                     st.success(f'Datos limpiados con éxito para {len(df_limpio)} registros depurados')
 
@@ -119,5 +122,39 @@ with l2:
 
     st.subheader('🔴 Con qué biomas y ecosistemas interactuan estas actividades')
 
+    if st.session_state['df_buffer_cliente'] is not None:
+
+        id_credito_actual = 'credito_bogota_2026_99'
+
+        if st.button('Aplicar'):
+
+            tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
+
+            # if tabla_legal:
+
+            df_esg_legal = ejecutar_motor_alertas_tnfd(tabla_legal)
+
+            # --------- BLOQUE 1: DIAGNÓSTICO JURÍDICO DEL TERRITORIO (PASA / NO PASA)
+            st.markdown('#### ⚖️ Estado de Cumplimiento Legal (Buffer del Proyecto)')
+
+            if not df_esg_legal.empty:
+
+                en_paramo = df_esg_legal.iloc[0]['en_paramo']
+                en_runap = df_esg_legal.iloc[0]['en_runap']
+                en_ramsar = df_esg_legal.iloc[0]['en_ramsar']
+                en_ley2 = df_esg_legal.iloc[0]['en_ley2']
+
+                # Alerta de bloqueo inmediato financiero
+                if en_paramo or en_runap or en_ramsar or en_ley2:
+
+                    st.error(' 🚨 **BLOQUEO PREVENTIVO DE CRÉDITO (SARAS)**')
+
+                else:
+
+                    st.success(' ✅ **Viabilidad de localización**')
+
+    
+
+    
 
 
