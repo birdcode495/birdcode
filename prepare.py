@@ -66,13 +66,13 @@ else:
 
 			st.metric(label = 'Aves Endémicas Identificadas', value = len(df_oportunidades))
 
-		with col2:
+		# with col2:
 
-			st.metric(label = 'Score de Atractivo Turístico Internacional', value = '4.8 / 5.0 (Premium)')
+		# 	st.metric(label = 'Score de Atractivo Turístico Internacional', value = '4.8 / 5.0 (Premium)')
 
-		with col3:
+		# with col3:
 
-			st.metric(label = 'Viabilidad de Crédito de Conservación', value = 'Apta (Tasa Preferencial)')
+		# 	st.metric(label = 'Viabilidad de Crédito de Conservación', value = 'Apta (Tasa Preferencial)')
 
 		st.markdown('---')
 		st.subheader('🔍 Inventario Homologado de Activos Bióticos para Reportes TNFD')
