@@ -153,6 +153,17 @@ with l2:
 
                     st.success(' ✅ **Viabilidad de localización**')
 
+                c1, c2, c3, c4 = st.columns(4)
+
+                c1.metric('Superposición Páramo', '🚨 SÍ' if en_paramo else '✅ NO', delta_color = 'inverse')
+                c2.metric('Superposición RUNAP', '🚨 SÍ' if en_runap else '✅ NO', delta_color = 'inverse')
+                c3.metric('Superposición Ramsar', '🚨 SÍ' if en_ramsar else '✅ NO', delta_color = 'inverse')
+                c4.metric('Superposición Ley 2', '🚨 SÍ' if en_ley2 else '✅ NO', delta_color = 'inverse')
+
+            else:
+
+                st.warning('No se cargaron datos válidos del polígono buffer')
+
     
 
     
