@@ -88,6 +88,64 @@ def cargar_dataframe_sesion_a_supabase(id_solicitud_banco):
 
 
 
+# ---------------------------------------------------------
+
+def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco):
+
+	# 1. Verification safeguard: pull the active dataset straight from global browser RAM
+	if 'df_buffer_cliente' not in st.session_state or st.session_state['df_buffer_cliente'] is None:
+
+		st.error('Ingestion failure: No active biodiversity dataset found in session memory')
+		return None
+
+	df_origen_pol = st.session_state['df_buffer_cliente']
+
+	if df_origen_pol.empty:
+
+		return None
+
+	try:
+
+		# Create a deep copy to prevent mutating the user's active session display matrix
+		df_temp = df_origen_pol.copy()
+
+		# 2. DATA CLEANING AND RE-TYPING (Crucial to avoid PostgreSQL datatype crashes)
+		# Convert any nested JSON dictionaries/lists from the GBIF API payload into basic strings
+		for col in df_temp.columns:
+
+			if df_temp[col].apply(lambda x: isinstance(x, (list, dict))).any():
+
+				df_temp[col] = df_temp[col].astype(str)
+
+		
+
+		# Build an enterprise-safe isolated table name using the unique banking loan transaction ID
+		nombre_tabla_destino = f'temp_analisis_{id_solicitud_banco}'
+
+		# 4. EXECUTE CLOUD EXPORT VIA GEOALCHEMY
+		engine = obtener_motor_supa()
+
+		st.info(f'Connecting to Supabase Cloud Server...uploading {len(gdf_temp)} rows to table {nombre_tabla_destino}')
+
+		# Geopandas generates the table infrastructure and PostGIS indices automatically
+		gdf_temp.to_postgis(
+			name = nombre_tabla_destino,
+			con = engine,
+			if_exists = 'replace', # Overwrite any stale, unclosed previous testing queries
+			index = False
+		)
+
+		st.success(f'Data pipeline complete. Ingestion table {nombre_tabla_destino} is now fully queryable via SQL.')
+		return nombre_tabla_destino
+
+	except Exception as e:
+
+		st.error(f'Error técnico durante el volcado de datos hacia Supabase: {e}')
+		return None
+
+
+
+
 def ejecutar_analisis_esg_postgis_aves(nombre_tabla_temp):
 
 	''' Runs multi-layer relational queries inside Supabase to extract local threat metrics'''
@@ -217,5 +275,55 @@ def ejecutar_analisis_esg_postgis_prepare(nombre_tabla_temp):
 		con.commit()
 
 	return df_esg_prepare
+
+
+def ejecutar_motor_alertas_tnfd(nombre_tabla_temp):
+
+	engine = obtener_motor_supa()
+
+	query_alertas = f'''
+
+		SELECT
+
+			DISTINCT g.species AS nombre_cientifico,
+			g.family AS familia,
+			--- Interseccion con paramos (MinAmbiente)
+			EXISTS (
+				SELECT 1 FROM paramos p
+				WHERE ST_Intersects(g.geometry, p.geom)
+			) AS en_paramo,
+			-- Interseccion con RUNAP (areas protegidas)
+			EXISTS (
+				SELECT 1 FROM runap r
+				WHERE ST_Intersects(g.geometry, r.geom)
+			) AS en_runap,
+			-- Interseccion con reservas forestales de la Ley 2 de 1959
+			EXISTS (
+				SELECT 1 FROM reservas_ley_2da_9377 l
+				WHERE ST_Intersects(g.geometry, l.geom)
+			) AS en_ley2,
+			-- Interseccion con humedales ramsar
+			EXISTS (
+				SELECT 1 FROM humedales_ramsar h
+				WHERE ST_Intersects(g.geometry, h.geom)
+			) AS en_ramsar
+
+		FROM {nombre_tabla_temp} g;'''
+
+
+	with engine.connect() as con:
+
+		# Load the complete joined SQL result instantly into a fresh pandas table matrix
+		df_esg_traslape = pd.read_sql_query(text(query_alertas), con)
+		#st.write('Columnas crudas entregadas por SQL', list(df_esg_final.columns))
+
+		# MANDATORY BANK SECURITY CLOSURE (No persistencia en disco NDA Rule)
+		# Erase the transient spatial points completely from the cloud schema right after evaluation
+		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
+		con.commit()
+
+	return df_esg_traslape
+
+
 
 

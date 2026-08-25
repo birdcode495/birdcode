@@ -35,6 +35,7 @@ def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros, max_regi
 		geometria_unida = gdf_metrico.unary_union
 		poligono_buffer_metrico = geometria_unida.buffer(distancia_buffer_metros)
 
+
 		# 3. EXTRA-DEFENSA: Calcular la envolvente convexa (Convex Hull) y SIMPLIFICAR
 		# El método .simplify(10) reduce drásticamente la cantidad de puntos de la curva del buffer,
 		# eliminando vértices innecesarios cada 10 metros para no saturar la URL de GBIF.
@@ -126,7 +127,7 @@ def obtener_occurrencias_gbif_directo_gdf(gdf, distancia_buffer_metros, max_regi
 
 		df_completo = pd.DataFrame(todos_los_registros)
 		#print(f'Total real en GBIF: {conteo_total_db} | Total descargado con éxito: {len(df_completo)}')
-		return df_completo
+		return df_completo, poligono_buffer_metrico
 
 
 	except Exception as e:
