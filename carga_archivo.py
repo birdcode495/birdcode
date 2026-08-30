@@ -120,7 +120,11 @@ with l1:
 
 with l2:
 
-    st.subheader('🔴 Con qué biomas y ecosistemas interactuan estas actividades')
+    st.subheader('🌲 ¿Con qué biomas y ecosistemas interactuan estas actividades?')
+
+    #st.markdown('---')
+
+    c1, c2 = st.tabs(['Análisis', 'Mapas'])
 
     if st.session_state['df_buffer_cliente'] is not None:
 
