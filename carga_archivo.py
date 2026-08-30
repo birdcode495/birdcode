@@ -3,7 +3,7 @@ import io
 import geopandas as gpd
 from Modules.gbif_pipeline import obtener_occurrencias_gbif_directo_gdf
 from Modules.data_cleaning import depurar_inventario_gbif
-from Modules.database import cargar_dataframe_pol_sesion_a_supabase, ejecutar_motor_alertas_tnfd 
+from Modules.database import cargar_dataframe_pol_sesion_a_supabase, ejecutar_motor_alertas_tnfd, calcular_areas_traslape_saras
 
 
 l1, l2, l3, l4 = st.tabs(['L1: Huella empresarial', 'L2: Interfaz con la naturaleza', 'L3: Ubicación prioritaria', 
@@ -133,6 +133,8 @@ with l2:
             # if tabla_legal:
 
             df_esg_legal = ejecutar_motor_alertas_tnfd(tabla_legal)
+            #tabla_legal2 = cargar_dataframe_pol_sesion_a_supabase
+            df_esg_traslape_legal = calcular_areas_traslape_saras(tabla_legal)
 
             # --------- BLOQUE 1: DIAGNÓSTICO JURÍDICO DEL TERRITORIO (PASA / NO PASA)
             st.markdown('#### ⚖️ Estado de Cumplimiento Legal (Buffer del Proyecto)')
@@ -163,6 +165,63 @@ with l2:
             else:
 
                 st.warning('No se cargaron datos válidos del polígono buffer')
+
+
+            st.markdown('#### 📐 Cuantificación Cuadrática de Afectación Territorial')
+
+            if not df_esg_traslape_legal.empty:
+
+                area_total_predio = df_esg_traslape_legal['area_total_proyecto_ha'].iloc[0]
+
+                st.markdown(
+
+                    f'**Área Total Evaluada del Solicitante (Buffer incluido):** {area_total_predio:,.2f} Hectáreas (Ha) '
+                    f'bajo el sistema de coordenadas oficial de Colombia **Magna-Sirgas Origen Único**.')
+
+                area_afectada_total = df_esg_traslape_legal['area_traslape_ha'].sum()
+
+                if area_afectada_total > 0:
+
+                    st.warning(
+
+                        f'⚠️ **Advertencia Global SARAS:** El predio presenta un traslape acumulado de '
+                        f'**{area_afectada_total:,.2f} Ha** con el Sistema de Áreas Protegidas y de Exclusión Legal.'
+
+                        )
+
+                else:
+
+                    st.success('🍏 **Frontera Agropecuaria Segura:** El predio evaluado está 100% libre de traslapes con capas restrictivas.')
+
+                df_interfaz = df_esg_traslape_legal[['capa_ambiental', 'area_traslape_ha', 'porcentaje_traslape']].copy()
+
+                st.dataframe(
+                    df_interfaz,
+                    column_config = {
+
+                        'capa_ambiental': st.column_config.TextColumn(
+                            'Capa Ambiental de Exclusión / Restricción',
+                            help = 'Capas oficiales digitalizadas por MinAmbiente, Parques Nacionales e Instituto Humbolt'
+                        ),
+
+                        'area_traslape_ha': st.column_config.NumberColumn(
+                            'Área de Traslape (Ha)',
+                            format = '%.2f Ha',
+                            help = 'Cantidad de hectáreas afectadas dentro del polígono cargado.'
+                        ),
+                        'porcentaje_traslape': st.column_config.ProgressColumn(
+                            'Porcentaje Afectado (%)',
+                            format = '%.2f %%',
+                            min_value = 0.0,
+                            max_value = 100.0,
+                            help = 'Proporción del predio del cliente que invade físicamente la zona de restricción.'
+                        )
+                    },
+                    use_container_width = True,
+                    hide_index = True
+
+                )
+
 
     
 

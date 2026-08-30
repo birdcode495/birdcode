@@ -321,10 +321,115 @@ def ejecutar_motor_alertas_tnfd(nombre_tabla_temp):
 
 		# MANDATORY BANK SECURITY CLOSURE (No persistencia en disco NDA Rule)
 		# Erase the transient spatial points completely from the cloud schema right after evaluation
-		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
+		#con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
 		con.commit()
 
 	return df_esg_traslape
+
+
+
+def calcular_areas_traslape_saras(nombre_tabla_temp):
+
+	engine = obtener_motor_supa()
+
+	query_traslapes = (f'''
+
+		WITH usuario_proyectado AS (
+
+			SELECT
+
+				ST_Transform(geometry, 9377) AS geom_9377,
+				ST_Area(ST_Transform(geometry, 9377)) / 10000.0 AS area_total_ha
+
+			FROM {nombre_tabla_temp}
+			LIMIT 1
+		),
+
+		calculo_paramos AS (
+			
+			SELECT
+
+				'🔴 Páramo (MinAmbiente)'::text AS capa_ambiental,
+				COALESCE(SUM(ST_Area(ST_Intersection(u.geom_9377, c.geom)) / 10000.0), 0.0) AS area_traslape_ha
+
+			FROM usuario_proyectado u, paramos c
+			WHERE ST_Intersects(u.geom_9377, c.geom)
+
+		),
+		calculo_runap AS (
+
+			SELECT
+
+				'🔴 RUNAP (Áreas Protegidas)'::text AS capa_ambiental,
+				COALESCE(SUM(ST_Area(ST_Intersection(u.geom_9377, c.geom)) / 10000.0), 0.0) AS area_traslape_ha
+
+			FROM usuario_proyectado u, runap c
+			WHERE ST_Intersects(u.geom_9377, c.geom)
+		),
+
+		calculo_ramsar AS (
+
+			SELECT
+
+				'🔴 Humedal Ramsar'::text AS capa_ambiental,
+				COALESCE(SUM(ST_Area(ST_Intersection(u.geom_9377, c.geom)) / 10000.0), 0.0) AS area_traslape_ha
+
+			FROM usuario_proyectado u, humedales_ramsar c
+			WHERE ST_Intersects(u.geom_9377, c.geom)
+		),
+
+		calculo_ley2 AS (
+
+			SELECT
+
+				'🟡 Reserva Forestal Ley 2'::text AS capa_ambiental,
+				COALESCE(SUM(ST_Area(ST_Intersection(u.geom_9377, c.geom)) / 10000.0), 0.0) AS area_traslape_ha
+
+			FROM usuario_proyectado u, reservas_ley_2da_9377 c
+			WHERE ST_Intersects(u.geom_9377, c.geom)
+		),
+
+		unificado AS (
+
+			SELECT * FROM calculo_paramos
+			UNION ALL SELECT * FROM calculo_runap
+			UNION ALL SELECT * FROM calculo_ramsar
+			UNION ALL SELECT * FROM calculo_ley2
+
+		)
+		
+		SELECT
+
+			u.area_total_ha AS area_total_proyecto_ha,
+			un.capa_ambiental,
+			un.area_traslape_ha,
+
+			CASE
+				WHEN u.area_total_ha > 0 THEN (un.area_traslape_ha / u.area_total_ha) * 100.0
+				ELSE 0.0
+
+			END AS porcentaje_traslape
+
+		FROM unificado un, usuario_proyectado u
+
+	''')
+
+
+	with engine.connect() as con:
+
+		# Load the complete joined SQL result instantly into a fresh pandas table matrix
+		df_esg_calculo_traslape = pd.read_sql_query(text(query_traslapes), con)
+		#st.write('Columnas crudas entregadas por SQL', list(df_esg_final.columns))
+
+		# MANDATORY BANK SECURITY CLOSURE (No persistencia en disco NDA Rule)
+		# Erase the transient spatial points completely from the cloud schema right after evaluation
+		con.execute(text(f'DROP TABLE IF EXISTS {nombre_tabla_temp};'))
+		con.commit()
+
+	return df_esg_calculo_traslape
+
+
+
 
 
 
