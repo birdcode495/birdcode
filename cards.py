@@ -16,10 +16,10 @@ def cargar_archivo_link():
 def lista_especies():
 
 	st.page_link('lista_especies.py', label = 'Evaluate & Assess: Diagnóstico', icon = ':material/local_florist:')
-	st.image('Images/Endangered_species.png', width = 270, use_container_width = True)
+	st.image('Images/Endangered_species.png', width = 260, use_container_width = True)
 
 
 def prepare():
 
 	st.page_link('prepare.py', label = 'Prepare: Oportunidades de Crédito Verde', icon = ':material/star:')
-	st.image('Images/Eagle3.png', width = 240, use_container_width = True)
+	st.image('Images/Eagle3.png', width = 260, use_container_width = True)

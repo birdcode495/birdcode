@@ -124,107 +124,109 @@ with l2:
 
     #st.markdown('---')
 
-    c1, c2 = st.tabs(['Análisis', 'Mapas'])
+    c1, c2 = st.tabs(['Análisis de traslapes', 'Visualizador Geográfico'])
 
-    if st.session_state['df_buffer_cliente'] is not None:
+    with c1:
 
-        id_credito_actual = 'credito_bogota_2026_99'
+        if st.session_state['df_buffer_cliente'] is not None:
 
-        if st.button('Aplicar'):
+            id_credito_actual = 'credito_bogota_2026_99'
 
-            tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
+            if st.button('Aplicar'):
 
-            # if tabla_legal:
+                tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
 
-            df_esg_legal = ejecutar_motor_alertas_tnfd(tabla_legal)
-            #tabla_legal2 = cargar_dataframe_pol_sesion_a_supabase
-            df_esg_traslape_legal = calcular_areas_traslape_saras(tabla_legal)
+                # if tabla_legal:
 
-            # --------- BLOQUE 1: DIAGNÓSTICO JURÍDICO DEL TERRITORIO (PASA / NO PASA)
-            st.markdown('#### ⚖️ Estado de Cumplimiento Legal (Buffer del Proyecto)')
+                df_esg_legal = ejecutar_motor_alertas_tnfd(tabla_legal)
+                #tabla_legal2 = cargar_dataframe_pol_sesion_a_supabase
+                df_esg_traslape_legal = calcular_areas_traslape_saras(tabla_legal)
 
-            if not df_esg_legal.empty:
+                # --------- BLOQUE 1: DIAGNÓSTICO JURÍDICO DEL TERRITORIO (PASA / NO PASA)
+                st.markdown('#### ⚖️ Estado de Cumplimiento Legal (Buffer del Proyecto)')
 
-                en_paramo = df_esg_legal.iloc[0]['en_paramo']
-                en_runap = df_esg_legal.iloc[0]['en_runap']
-                en_ramsar = df_esg_legal.iloc[0]['en_ramsar']
-                en_ley2 = df_esg_legal.iloc[0]['en_ley2']
+                if not df_esg_legal.empty:
 
-                # Alerta de bloqueo inmediato financiero
-                if en_paramo or en_runap or en_ramsar or en_ley2:
+                    en_paramo = df_esg_legal.iloc[0]['en_paramo']
+                    en_runap = df_esg_legal.iloc[0]['en_runap']
+                    en_ramsar = df_esg_legal.iloc[0]['en_ramsar']
+                    en_ley2 = df_esg_legal.iloc[0]['en_ley2']
 
-                    st.error(' 🚨 **BLOQUEO PREVENTIVO DE CRÉDITO (SARAS)**')
+                    # Alerta de bloqueo inmediato financiero
+                    if en_paramo or en_runap or en_ramsar or en_ley2:
 
-                else:
+                        st.error(' 🚨 **BLOQUEO PREVENTIVO DE CRÉDITO (SARAS)**')
 
-                    st.success(' ✅ **Viabilidad de localización**')
+                    else:
 
-                c1, c2, c3, c4 = st.columns(4)
+                        st.success(' ✅ **Viabilidad de localización**')
 
-                c1.metric('Superposición Páramo', '🚨 SÍ' if en_paramo else '✅ NO', delta_color = 'inverse')
-                c2.metric('Superposición RUNAP', '🚨 SÍ' if en_runap else '✅ NO', delta_color = 'inverse')
-                c3.metric('Superposición Ramsar', '🚨 SÍ' if en_ramsar else '✅ NO', delta_color = 'inverse')
-                c4.metric('Superposición Ley 2', '🚨 SÍ' if en_ley2 else '✅ NO', delta_color = 'inverse')
+                    c1, c2, c3, c4 = st.columns(4)
 
-            else:
-
-                st.warning('No se cargaron datos válidos del polígono buffer')
-
-
-            st.markdown('#### 📐 Cuantificación Cuadrática de Afectación Territorial')
-
-            if not df_esg_traslape_legal.empty:
-
-                area_total_predio = df_esg_traslape_legal['area_total_proyecto_ha'].iloc[0]
-
-                st.markdown(
-
-                    f'**Área Total Evaluada del Solicitante (Buffer incluido):** {area_total_predio:,.2f} Hectáreas (Ha) '
-                    f'bajo el sistema de coordenadas oficial de Colombia **Magna-Sirgas Origen Único**.')
-
-                area_afectada_total = df_esg_traslape_legal['area_traslape_ha'].sum()
-
-                if area_afectada_total > 0:
-
-                    st.warning(
-
-                        f'⚠️ **Advertencia Global SARAS:** El predio presenta un traslape acumulado de '
-                        f'**{area_afectada_total:,.2f} Ha** con el Sistema de Áreas Protegidas y de Exclusión Legal.'
-
-                        )
+                    c1.metric('Superposición Páramo', '🚨 SÍ' if en_paramo else '✅ NO', delta_color = 'inverse')
+                    c2.metric('Superposición RUNAP', '🚨 SÍ' if en_runap else '✅ NO', delta_color = 'inverse')
+                    c3.metric('Superposición Ramsar', '🚨 SÍ' if en_ramsar else '✅ NO', delta_color = 'inverse')
+                    c4.metric('Superposición Ley 2', '🚨 SÍ' if en_ley2 else '✅ NO', delta_color = 'inverse')
 
                 else:
 
-                    st.success('🍏 **Frontera Agropecuaria Segura:** El predio evaluado está 100% libre de traslapes con capas restrictivas.')
+                    st.warning('No se cargaron datos válidos del polígono buffer')
 
-                df_interfaz = df_esg_traslape_legal[['capa_ambiental', 'area_traslape_ha', 'porcentaje_traslape']].copy()
 
-                st.dataframe(
-                    df_interfaz,
-                    column_config = {
+                st.markdown('#### 📐 Cuantificación Cuadrática de Afectación Territorial')
 
-                        'capa_ambiental': st.column_config.TextColumn(
-                            'Capa Ambiental de Exclusión / Restricción',
-                            help = 'Capas oficiales digitalizadas por MinAmbiente, Parques Nacionales e Instituto Humbolt'
-                        ),
+                if not df_esg_traslape_legal.empty:
 
-                        'area_traslape_ha': st.column_config.NumberColumn(
-                            'Área de Traslape (Ha)',
-                            format = '%.2f Ha',
-                            help = 'Cantidad de hectáreas afectadas dentro del polígono cargado.'
-                        ),
-                        'porcentaje_traslape': st.column_config.ProgressColumn(
-                            'Porcentaje Afectado (%)',
-                            format = '%.2f %%',
-                            min_value = 0.0,
-                            max_value = 100.0,
-                            help = 'Proporción del predio del cliente que invade físicamente la zona de restricción.'
+                    area_total_predio = df_esg_traslape_legal['area_total_proyecto_ha'].iloc[0]
+
+                    st.markdown(
+
+                        f'**Área Total Evaluada del Solicitante (Buffer incluido):** {area_total_predio:,.2f} Hectáreas (Ha) '
+                        f'bajo el sistema de coordenadas oficial de Colombia **Magna-Sirgas Origen Único**.')
+
+                    area_afectada_total = df_esg_traslape_legal['area_traslape_ha'].sum()
+
+                    if area_afectada_total > 0:
+
+                        st.warning(
+
+                            f'⚠️ **Advertencia Global SARAS:** El predio presenta un traslape acumulado de '
+                            f'**{area_afectada_total:,.2f} Ha** con el Sistema de Áreas Protegidas y de Exclusión Legal.'
+
                         )
-                    },
-                    use_container_width = True,
-                    hide_index = True
 
-                )
+                    else:
+
+                        st.success('🍏 **Frontera Agropecuaria Segura:** El predio evaluado está 100% libre de traslapes con capas restrictivas.')
+
+                    df_interfaz = df_esg_traslape_legal[['capa_ambiental', 'area_traslape_ha', 'porcentaje_traslape']].copy()
+
+                    st.dataframe(
+                        df_interfaz,
+                        column_config = {
+
+                            'capa_ambiental': st.column_config.TextColumn(
+                                'Capa Ambiental de Exclusión / Restricción',
+                                help = 'Capas oficiales digitalizadas por MinAmbiente, Parques Nacionales e Instituto Humbolt'
+                            ),
+
+                            'area_traslape_ha': st.column_config.NumberColumn(
+                                'Área de Traslape (Ha)',
+                                format = '%.2f Ha',
+                                help = 'Cantidad de hectáreas afectadas dentro del polígono cargado.'
+                            ),
+                            'porcentaje_traslape': st.column_config.ProgressColumn(
+                                'Porcentaje Afectado (%)',
+                                format = '%.2f %%',
+                                min_value = 0.0,
+                                max_value = 100.0,
+                                help = 'Proporción del predio del cliente que invade físicamente la zona de restricción.'
+                            )
+                        },
+                        use_container_width = True,
+                        hide_index = True
+
+                    )
 
 
     
