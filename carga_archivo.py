@@ -114,7 +114,7 @@ with l1:
 
             st.session_state['df_gbif_bruto'] = None
             st.session_state['shp_cargado'] = False
-            st.session_state['df_buffer_cliente'] = False
+            st.session_state['df_buffer_cliente'] = None
             st.rerun()
 
 
@@ -128,12 +128,15 @@ with l2:
 
     with c1:
 
-        if st.session_state['df_buffer_cliente'] is not None:
+        if 'df_buffer_cliente' not in st.session_state or st.session_state['df_buffer_cliente'] is None:
 
-            id_credito_actual = 'credito_bogota_2026_99'
+            st.warning('⚠️ No se detectan datos espaciales en la sesión. Por favor cargue primero el shapefile / GeoJSON del proyecto en la sección **Huella Empresarial**')
 
-            if st.button('Aplicar'):
+        else:
 
+            if st.button('Aplicar análisis'):
+
+                id_credito_actual = 'credito_bogota_2026_99999'
                 tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
 
                 # if tabla_legal:
@@ -227,6 +230,9 @@ with l2:
                         hide_index = True
 
                     )
+
+
+
 
 
     

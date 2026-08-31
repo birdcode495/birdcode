@@ -12,7 +12,7 @@ if 'shp_cargado' not in st.session_state:
 
 if 'df_buffer_cliente' not in st.session_state:
 
-	st.session_state['df_buffer_cliente'] = False
+	st.session_state['df_buffer_cliente'] = None
 
 # Initialize widget memory key
 # We set the default text to match the 2000 meters option
