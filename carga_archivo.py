@@ -85,6 +85,7 @@ with l1:
                     st.session_state['shp_cargado'] = True
                     st.session_state['ultima_distancia'] = distancia_buffer
                     st.session_state['df_buffer_cliente'] = df_pol
+                    st.session_state['df_crudo_pol_cliente'] = gdf_cliente
 
                     if st.session_state['df_buffer_cliente'] is not None:
                         st.success(f'Poligono cargado a session state')
@@ -115,6 +116,8 @@ with l1:
             st.session_state['df_gbif_bruto'] = None
             st.session_state['shp_cargado'] = False
             st.session_state['df_buffer_cliente'] = None
+            st.session_state['ultima_distancia'] = None
+            st.session_state['df_crudo_pol_cliente'] = None
             st.rerun()
 
 
@@ -137,7 +140,8 @@ with l2:
             if st.button('Aplicar análisis'):
 
                 id_credito_actual = 'credito_bogota_2026_99999'
-                tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
+                id_credito_actual2 = 'credito_bogota_2026_9199'
+                tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual, id_solicitud_banco2 = id_credito_actual2)
 
                 # if tabla_legal:
 

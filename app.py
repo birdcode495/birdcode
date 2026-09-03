@@ -14,6 +14,10 @@ if 'df_buffer_cliente' not in st.session_state:
 
 	st.session_state['df_buffer_cliente'] = None
 
+if 'df_crudo_pol_cliente' not in st.session_state:
+
+	st.session_state['df_crudo_pol_cliente'] = None
+
 # Initialize widget memory key
 # We set the default text to match the 2000 meters option
 # if 'buffer_seleccionado' not in st.session_state:
@@ -34,17 +38,17 @@ pages = [
 		),
 	st.Page(
 		'carga_archivo.py',
-		title = 'Paso 1: Locate',
+		title = 'Paso 1: Localizar',
 		icon = ':material/upload_file:'
 		),
 	st.Page(
 		'lista_especies.py',
-		title = 'Paso 2: Evaluate & Assess',
+		title = 'Paso 2: Evaluar & Analizar',
 		icon = ':material/local_florist:'
 		),
 	st.Page(
 		'prepare.py',
-		title = 'Paso 3: Prepare',
+		title = 'Paso 3: Preparar',
 		icon = ':material/star:'
 		),
 	st.Page(

@@ -9,17 +9,17 @@ def iniciar_sesion():
 
 def cargar_archivo_link():
 
-	st.page_link('carga_archivo.py', label = 'Locate: Ubicación del Proyecto', icon = ':material/upload_file:')
+	st.page_link('carga_archivo.py', label = 'Localizar: Ubicación del Proyecto', icon = ':material/upload_file:')
 	st.image('Images/Upload_file.png', width = 260, use_container_width = True)
 
 
 def lista_especies():
 
-	st.page_link('lista_especies.py', label = 'Evaluate & Assess: Diagnóstico', icon = ':material/local_florist:')
+	st.page_link('lista_especies.py', label = 'Evaluar & Analizar: Diagnóstico', icon = ':material/local_florist:')
 	st.image('Images/Endangered_species.png', width = 260, use_container_width = True)
 
 
 def prepare():
 
-	st.page_link('prepare.py', label = 'Prepare: Oportunidades de Crédito Verde', icon = ':material/star:')
+	st.page_link('prepare.py', label = 'Preparar: Oportunidades de Crédito Verde', icon = ':material/star:')
 	st.image('Images/Eagle3.png', width = 260, use_container_width = True)
