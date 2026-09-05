@@ -81,15 +81,15 @@ with st.sidebar.container(height=310):
 
     	st.page_link('login.py', label = 'Login')
 
-    elif page.title == 'Paso 1: Locate':
+    elif page.title == 'Paso 1: Localizar':
 
         st.page_link("carga_archivo.py", label = 'LEAP: Locate')
 
-    elif page.title == 'Paso 2: Evaluate & Assess':
+    elif page.title == 'Paso 2: Evaluar & Analizar':
 
         st.page_link('lista_especies.py', label = 'Evaluate & Assess')
 
-    elif page.title == 'Paso 3: Prepare':
+    elif page.title == 'Paso 3: Preparar':
 
         st.page_link('prepare.py', label = 'Prepare')
 
