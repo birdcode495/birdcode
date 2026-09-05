@@ -90,7 +90,7 @@ def cargar_dataframe_sesion_a_supabase(id_solicitud_banco):
 
 # ---------------------------------------------------------
 
-def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco, id_solicitud_banco2):
+def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco):
 
 	# 1. Verification safeguard: pull the active dataset straight from global browser RAM
 	if 'df_buffer_cliente' not in st.session_state or st.session_state['df_buffer_cliente'] is None:
@@ -123,10 +123,10 @@ def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco, id_solicitud_banc
 
 		# Build an enterprise-safe isolated table name using the unique banking loan transaction ID
 		nombre_tabla_destino = f'temp_analisis_{id_solicitud_banco}'
-		nombre_tabla_destino_pol_crudo = f'temp_analisis_pol_crudo_{id_solicitud_banco2}'
+		#nombre_tabla_destino_pol_crudo = f'temp_analisis_pol_crudo_{id_solicitud_banco2}'
 
 		gdf_temp = gpd.GeoDataFrame(geometry = [df_temp], crs = 'EPSG:9377')
-		gdf_temp_pol_crudo = gdp.GeoDataFrame(geometry = [df_temp_pol_crudo])
+		#gdf_temp_pol_crudo = gpd.GeoDataFrame(geometry = [df_temp_pol_crudo], crs = 'EPSG:9377')
 
 		# 4. EXECUTE CLOUD EXPORT VIA GEOALCHEMY
 		engine = obtener_motor_supa()
@@ -141,15 +141,15 @@ def cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco, id_solicitud_banc
 			index = False
 		)
 
-		gdf_temp_pol_crudo.to_postgis(
-			name = nombre_tabla_destino_pol_crudo,
-			con = engine,
-			if_exists = 'replace',
-			index = False
-		)
+		# gdf_temp_pol_crudo.to_postgis(
+		# 	name = nombre_tabla_destino_pol_crudo,
+		# 	con = engine,
+		# 	if_exists = 'replace',
+		# 	index = False
+		# )
 
 		st.success(f'Procesamiento de datos completado.La tabla {nombre_tabla_destino} está disponible ahora para realizar consultas SQL.')
-		return nombre_tabla_destino, nombre_tabla_destino_pol_crudo
+		return nombre_tabla_destino
 
 	except Exception as e:
 

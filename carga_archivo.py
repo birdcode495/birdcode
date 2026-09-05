@@ -140,8 +140,8 @@ with l2:
             if st.button('Aplicar análisis'):
 
                 id_credito_actual = 'credito_bogota_2026_99999'
-                id_credito_actual2 = 'credito_bogota_2026_9199'
-                tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual, id_solicitud_banco2 = id_credito_actual2)
+                #id_credito_actual2 = 'credito_bogota_2026_9199'
+                tabla_legal = cargar_dataframe_pol_sesion_a_supabase(id_solicitud_banco = id_credito_actual)
 
                 # if tabla_legal:
 
